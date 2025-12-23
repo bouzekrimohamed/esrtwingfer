@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contrôle ESR – KN Ferrière</title>
+
+    <!-- SweetAlert for enhanced popups -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Three.js for WebGL immersive animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <style>
+        /* ====== GLOBAL STYLES ====== */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #0a0f1f;
+            color: white;
+            overflow: hidden;
+            position: relative;
+            perspective: 1500px; /* Enable 3D space for immersive effects */
+        }
+        /* ====== CANVAS FOR WEBGL BACKGROUND ====== */
+        #webgl-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -3;
+        }
+        /* ====== NEON PARTICLES OVERLAY WITH 3D DEPTH ====== */
+        .particles {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: -1;
+            overflow: hidden;
+            perspective: 1000px;
+            transform-style: preserve-3d;
+        }
+        .particle {
+            position: absolute;
+            width: 5px;
+            height: 5px;
+            background: #00eaff;
+            border-radius: 50%;
+            animation: particleFloat 15s infinite linear, particleGlow 2s infinite alternate, particle3D 10s infinite ease-in-out;
+            opacity: 0.5;
+            transform-style: preserve-3d;
+        }
+        @keyframes particleFloat {
+            0% { transform: translate(0, 0) translateZ(0); }
+            100% { transform: translate(100vw, -100vh) translateZ(100px); }
+        }
+        @keyframes particleGlow {
+            0% { box-shadow: 0 0 5px #00eaff; }
+            100% { box-shadow: 0 0 15px #a94dff; }
+        }
+        @keyframes particle3D {
+            0% { transform: translateZ(-50px); }
+            50% { transform: translateZ(50px); }
+            100% { transform: translateZ(-50px); }
+        }
+        /* ====== HEADER ====== */
+        header {
+            padding: 20px 40px;
+            display: flex;
+            justify-content: flex-end;
+            position: relative;
+            z-index: 10;
+            transform-style: preserve-3d;
+        }
+        .logo {
+            height: 80px;
+            filter: drop-shadow(0 0 15px #2af3ff) brightness(1.2);
+            animation: float 4s infinite ease-in-out, neonFlicker 1.5s infinite;
+            transform: rotateY(10deg) translateZ(20px);
+        }
+        @keyframes neonFlicker {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+        @keyframes float { 50% { transform: translateY(-8px) rotateY(10deg) translateZ(20px); } }
+
+        /* ====== MAIN ====== */
+        main {
+            text-align: center;
+            padding: 100px 20px;
+            position: relative;
+            z-index: 5;
+            transform-style: preserve-3d;
+            perspective: 1200px;
+        }
+        h1 {
+            font-size: 3.5em;
+            font-weight: 900;
+            margin-bottom: 70px;
+            text-shadow: 0 0 20px #00eaff, 0 0 30px #a94dff, 0 0 40px #ff00ff;
+            animation: fadeUp 1s ease-out, textNeonPulse 2s infinite alternate, title3D 5s infinite ease-in-out;
+            transform-style: preserve-3d;
+        }
+        @keyframes textNeonPulse {
+            0% { text-shadow: 0 0 20px #00eaff; }
+            100% { text-shadow: 0 0 30px #a94dff; }
+        }
+        @keyframes title3D {
+            0% { transform: rotateX(5deg) translateZ(0); }
+            50% { transform: rotateX(-5deg) translateZ(30px); }
+            100% { transform: rotateX(5deg) translateZ(0); }
+        }
+        @keyframes fadeUp { 0% { opacity: 0; transform: translateY(60px) rotateX(0); } 100% { opacity: 1; } }
+
+        /* ====== MERCHANTS CONTAINER ====== */
+        .merchants {
+            display: flex;
+            justify-content: center;
+            gap: 60px;
+            flex-wrap: wrap;
+            animation: fadeUp 1.2s ease-out;
+            perspective: 1500px;
+            transform-style: preserve-3d;
+        }
+        /* ====== ADVANCED GLASSMORPH NEON CARDS WITH 3D ANIMATIONS ====== */
+        .card {
+            width: 280px;
+            height: 280px;
+            border-radius: 25px;
+            border: 2px solid rgba(255,255,255,.2);
+            backdrop-filter: blur(25px) saturate(1.8);
+            background: linear-gradient(135deg, rgba(255,255,255,.1), rgba(255,255,255,.05));
+            box-shadow: 0 0 30px rgba(255,255,255,.15), 0 0 25px #664cf7aa, 0 0 50px #c084fcaa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            position: relative;
+            overflow: hidden;
+            transform-style: preserve-3d;
+            animation: cardIdle 8s infinite ease-in-out;
+            text-decoration: none;
+        }
+        .card::before {
+            content: '';
+            position: absolute;
+            inset: -5px;
+            background: linear-gradient(45deg, #ff00ff, #00ffff, #ff00ff);
+            filter: blur(30px);
+            opacity: 0.6;
+            animation: rotateGradient 10s infinite linear;
+            z-index: -1;
+            transform: translateZ(-10px);
+        }
+        @keyframes rotateGradient {
+            0% { transform: rotate(0deg) translateZ(-10px); }
+            100% { transform: rotate(360deg) translateZ(-10px); }
+        }
+        @keyframes cardIdle {
+            0% { transform: rotateY(0deg) rotateX(0deg) translateZ(0); }
+            50% { transform: rotateY(5deg) rotateX(3deg) translateZ(20px); }
+            100% { transform: rotateY(0deg) rotateX(0deg) translateZ(0); }
+        }
+        .card:hover {
+            transform: translateY(-15px) scale(1.08) rotateY(15deg) rotateX(10deg) translateZ(50px);
+            box-shadow: 0 0 50px #c084fc, 0 0 80px #21d4fd, 0 0 100px #ff00ffaa;
+            border-color: rgba(255,255,255,.4);
+            animation: none;
+        }
+        .card img {
+            width: 85%;
+            height: 85%;
+            object-fit: contain;
+            filter: drop-shadow(0 0 15px #00eaff);
+            animation: imgGlow 4s infinite ease-in-out;
+            transform: translateZ(20px);
+            transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+        .card:hover img {
+            transform: translateZ(40px) scale(1.1);
+        }
+        @keyframes imgGlow { 50% { filter: drop-shadow(0 0 20px #a94dff); } }
+
+        /* ====== FOOTER ====== */
+        footer {
+            text-align: center;
+            padding: 30px;
+            font-size: 0.9em;
+            color: #b0d4ff;
+            text-shadow: 0 0 8px #4ca3ff;
+            position: relative;
+            z-index: 5;
+            transform-style: preserve-3d;
+            animation: footerFloat 6s infinite ease-in-out;
+        }
+        @keyframes footerFloat { 50% { transform: translateZ(10px); } }
+
+        /* ====== SWEETALERT CUSTOM BUTTON LIST ====== */
+        .bb-actions{
+            display:flex;
+            flex-direction:column;
+            gap:12px;
+            margin-top:10px;
+        }
+        .bb-actions button{
+            width:100%;
+            padding:14px 14px;
+            border-radius:14px;
+            border:1px solid rgba(255,255,255,.25);
+            background: rgba(255,255,255,.08);
+            color:#fff;
+            font-weight:700;
+            cursor:pointer;
+            transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
+            box-shadow: 0 0 18px rgba(33, 212, 253, .15);
+        }
+        .bb-actions button:hover{
+            transform: translateY(-2px);
+            background: rgba(255,255,255,.12);
+            box-shadow: 0 0 24px rgba(192, 132, 252, .25);
+        }
+        .bb-actions button:active{
+            transform: translateY(0px);
+        }
+        .bb-hint{
+            margin-top:10px;
+            font-size:.95em;
+            color:#b0d4ff;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="webgl-background"></canvas>
+
+    <div class="particles">
+        <script>
+            for (let i = 0; i < 80; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = `${Math.random() * 100}vw`;
+                particle.style.top = `${Math.random() * 100}vh`;
+                particle.style.animationDelay = `${Math.random() * 10}s`;
+                particle.style.animationDuration = `${10 + Math.random() * 20}s`;
+                document.querySelector('.particles').appendChild(particle);
+            }
+        </script>
+    </div>
+
+    <header>
+        <img src="kn.png" class="logo" alt="Kuehne Nagel Logo">
+    </header>
+
+    <main>
+        <h1> Contrôle ESR • Ferrière</h1>
+
+        <div class="merchants">
+            <!-- Nexo -->
+            <a class="card" href="https://nexo.com" rel="noopener noreferrer">
+                <img src="nexo.png" alt="Nexo">
+            </a>
+
+            <!-- BigBlue -->
+            <div class="card" onclick="openBigBlueMenu()">
+                <img src="bigblue.png" alt="BigBlue">
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        Kuehne+nagel 2025 © By Mohamed BOUZEKRI
+    </footer>
+
+    <script>
+        // WebGL Immersive Neon Particle Background with Three.js
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+
+        const renderer = new THREE.WebGLRenderer({
+            canvas: document.getElementById('webgl-background'),
+            alpha: true
+        });
+
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2)); // petite amélioration perf/qualité
+
+        // Create neon particles
+        const particlesGeometry = new THREE.BufferGeometry();
+        const particlesCount = 5000;
+        const posArray = new Float32Array(particlesCount * 3);
+        const colorsArray = new Float32Array(particlesCount * 3);
+
+        for (let i = 0; i < particlesCount * 3; i += 3) {
+            posArray[i] = (Math.random() - 0.5) * 10;
+            posArray[i + 1] = (Math.random() - 0.5) * 10;
+            posArray[i + 2] = (Math.random() - 0.5) * 10;
+
+            const color = new THREE.Color();
+            color.setHSL(Math.random(), 1, 0.7);
+            colorsArray[i] = color.r;
+            colorsArray[i + 1] = color.g;
+            colorsArray[i + 2] = color.b;
+        }
+
+        particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+        particlesGeometry.setAttribute('color', new THREE.BufferAttribute(colorsArray, 3));
+
+        const material = new THREE.PointsMaterial({
+            size: 0.01,
+            vertexColors: true,
+            blending: THREE.AdditiveBlending,
+            transparent: true,
+            depthTest: false
+        });
+
+        const particlesMesh = new THREE.Points(particlesGeometry, material);
+        scene.add(particlesMesh);
+
+        camera.position.z = 5;
+
+        let time = 0;
+        function animate() {
+            requestAnimationFrame(animate);
+            time += 0.01;
+
+            particlesMesh.rotation.x = Math.sin(time * 0.5) * 0.1;
+            particlesMesh.rotation.y = Math.cos(time * 0.3) * 0.1;
+            particlesMesh.rotation.z = time * 0.05;
+
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        // Resize handler
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // ---- BigBlue Menu ----
+        const BB_LINK_NON_FROF = "https://metabase.internal.bigblue.co/public/question/809de840-004e-4bd7-b508-0ec9d176b973?Merchant=&Not_merchant=FROF";
+        const BB_LINK_FROF     = "https://metabase.internal.bigblue.co/public/question/809de840-004e-4bd7-b508-0ec9d176b973?Merchant=FROF&Not_merchant=";
+        const BB_APP_PIVOT     = "https://github.com/bouzekrimohamed/bigblueexe/releases/latest/download/Launch_BigBlue.bat";
+
+        function downloadFile(url, filename) {
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+        }
+
+        function openBigBlueMenu() {
+            Swal.fire({
+                title: 'BigBlue',
+                icon: 'info',
+                html: `
+                    <div class="bb-actions">
+                        <button id="bb-frof">Lien liste FROF</button>
+                        <button id="bb-nonfrof">Lien liste NON FROF</button>
+                        <button id="bb-app">Lien app_pivot</button>
+                    </div>
+                    <div class="bb-hint">Choisis une action 👇</div>
+                `,
+                showConfirmButton: false,
+                showCloseButton: true,
+                background: 'rgba(10,15,31,0.92)',
+                color: '#fff',
+                didOpen: () => {
+                    const popup = Swal.getPopup();
+
+                    popup.querySelector('#bb-frof').addEventListener('click', () => {
+                        window.open(BB_LINK_FROF, "_blank");
+                    });
+
+                    popup.querySelector('#bb-nonfrof').addEventListener('click', () => {
+                        window.open(BB_LINK_NON_FROF, "_blank");
+                    });
+
+                    popup.querySelector('#bb-app').addEventListener('click', () => {
+                        downloadFile(BB_APP_PIVOT, "Launch_BigBlue.bat");
+                        Swal.fire({
+                            title: 'Téléchargement lancé ✅',
+                            text: 'Le fichier Launch_BigBlue.bat a été téléchargé.',
+                            icon: 'success',
+                            timer: 1800,
+                            showConfirmButton: false,
+                            background: 'rgba(10,15,31,0.92)',
+                            color: '#fff'
+                        });
+                    });
+                }
+            });
+        }
+    </script>
+</body>
+</html>
