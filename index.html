@@ -228,6 +228,50 @@
             font-size:.95em;
             color:#b0d4ff;
         }
+		
+		/* ====== NEXO WIP POPUP ====== */
+.nexo-wip-popup {
+    border-radius: 22px !important;
+    border: 1px solid rgba(255,255,255,.18) !important;
+    box-shadow: 0 0 30px rgba(33,212,253,.18), 0 0 55px rgba(192,132,252,.18) !important;
+    backdrop-filter: blur(18px) saturate(1.6);
+}
+
+.nexo-wip-box { text-align: center; padding: 6px 2px; }
+.nexo-wip-title {
+    font-size: 1.25em;
+    font-weight: 900;
+    margin-bottom: 8px;
+    text-shadow: 0 0 12px rgba(33,212,253,.35);
+}
+.nexo-wip-text { font-size: 1.05em; opacity: .95; margin-bottom: 14px; }
+
+.nexo-wip-loader {
+    width: 100%;
+    height: 12px;
+    border-radius: 999px;
+    background: rgba(255,255,255,.08);
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,.14);
+    margin: 10px 0 12px;
+}
+.nexo-wip-bar {
+    height: 100%;
+    width: 45%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #21d4fd, #c084fc, #21d4fd);
+    animation: nexoMove 1.35s infinite ease-in-out;
+    filter: drop-shadow(0 0 10px rgba(33,212,253,.35));
+}
+@keyframes nexoMove {
+    0%   { transform: translateX(-30%); }
+    50%  { transform: translateX(130%); }
+    100% { transform: translateX(-30%); }
+}
+
+.nexo-wip-dots { font-size: .98em; color: #b0d4ff; margin-top: 4px; }
+.nexo-wip-emojis { margin-top: 10px; font-size: 1.2em; letter-spacing: 6px; opacity: .95; }
+
     </style>
 </head>
 
@@ -257,9 +301,11 @@
 
         <div class="merchants">
             <!-- Nexo -->
-            <a class="card" href="https://nexo.com" rel="noopener noreferrer">
-                <img src="nexo.png" alt="Nexo">
-            </a>
+            <!-- Nexo -->
+<div class="card" onclick="openNexoWip()">
+    <img src="nexo.png" alt="Nexo">
+</div>
+
 
             <!-- BigBlue -->
             <div class="card" onclick="openBigBlueMenu()">
@@ -273,6 +319,52 @@
     </footer>
 
     <script>
+	function openNexoWip() {
+    Swal.fire({
+        title: 'Nexo 🧪',
+        icon: 'info',
+        html: `
+            <div class="nexo-wip-box">
+                <div class="nexo-wip-title">Outil en développement</div>
+                <div class="nexo-wip-text">
+                    par <b>Mohamed</b> 🚀✨
+                </div>
+
+                <div class="nexo-wip-loader">
+                    <div class="nexo-wip-bar"></div>
+                </div>
+
+                <div class="nexo-wip-dots">
+                    Merci pour ta patience <span id="nexoDots">...</span> 🙏💙
+                </div>
+
+                <div class="nexo-wip-emojis">
+                    🔧⚡📦🧠🌍
+                </div>
+            </div>
+        `,
+        showCloseButton: true,
+        confirmButtonText: 'OK ✅',
+        confirmButtonColor: '#21d4fd',
+        background: 'rgba(10,15,31,0.92)',
+        color: '#fff',
+        customClass: { popup: 'nexo-wip-popup' },
+        didOpen: () => {
+            // Animation des "..."
+            const dotsEl = document.getElementById('nexoDots');
+            let n = 0;
+            const timer = setInterval(() => {
+                n = (n + 1) % 4;
+                dotsEl.textContent = '.'.repeat(n);
+            }, 350);
+
+            // stop timer when modal closes
+            Swal.getPopup().addEventListener('click', () => {});
+            Swal.getCloseButton().addEventListener('click', () => clearInterval(timer));
+        }
+    });
+}
+
         // WebGL Immersive Neon Particle Background with Three.js
         const scene = new THREE.Scene();
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
